@@ -6,30 +6,64 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
   <style>
     body {
-      background: linear-gradient(to right, #74ebd5, #9face6);
+      background: linear-gradient(to right, #fceabb, #f8b500);
       height: 100vh;
     }
     .card {
       margin-top: 100px;
       border-radius: 20px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      background: linear-gradient(to right, #e0c3fc, #8ec5fc);
     }
   </style>
 </head>
 <body>
   <div class="container d-flex justify-content-center">
     <div class="card p-4 col-md-6">
-      <h2 class="text-center mb-3">KEVIN - Login</h2>
+      <h2 class="text-center mb-3">Login to <strong>KEVIN</strong></h2>
       <input type="email" id="loginEmail" class="form-control mb-3" placeholder="Email" />
       <input type="password" id="loginPassword" class="form-control mb-3" placeholder="Password" />
-      <button onclick="login()" class="btn btn-primary w-100 mb-2">Login</button>
-      <button onclick="location.href='signup.html'" class="btn btn-secondary w-100">Signup</button>
+      <button onclick="login()" class="btn btn-primary w-100">Login</button>
+      <button onclick="location.href='signup.html'" class="btn btn-outline-dark w-100 mt-2">Create Account</button>
     </div>
   </div>
 
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  <script src="firebase-config.js"></script>
-  <script src="script.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBEP1-Kxz10v6MuMzVMi-AaLs3gNZNfdaI",
+      authDomain: "kevin-267bc.firebaseapp.com",
+      projectId: "kevin-267bc",
+      storageBucket: "kevin-267bc.firebasestorage.app",
+      messagingSenderId: "302532711334",
+      appId: "1:302532711334:web:7edf7e82176e4466f0f567",
+      measurementId: "G-XSCMPQ3DWK"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    function login() {
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value;
+
+      if (!email || !password) {
+        alert("Please enter both email and password.");
+        return;
+      }
+
+      firebase.auth().signInWithEmailAndPassword(email, password)
+        .then(userCredential => {
+          const email = userCredential.user.email;
+          const username = email.split('@')[0];
+          localStorage.setItem("username", username);
+          window.location.href = "dashboard.html";
+        })
+        .catch(error => {
+          console.error("Login error:", error);
+          alert(error.message);
+        });
+    }
+  </script>
 </body>
 </html>
