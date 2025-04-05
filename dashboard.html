@@ -13,6 +13,19 @@
       position: relative;
 
     }
+    @keyframes wave-move {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    @keyframes rainbow {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
+    }
     .navbar {
       background-color: #ffffffaa;
       backdrop-filter: blur(10px);
