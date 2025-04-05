@@ -1,0 +1,57 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>KEVIN - Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f4f6f8;
+      padding: 2rem;
+    }
+    .card {
+      border-radius: 15px;
+    }
+    .qr-section {
+      display: none;
+      margin-top: 2rem;
+    }
+    .qr-img {
+      max-width: 300px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold">KEVIN</h2>
+    <div class="dropdown">
+      <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" id="userDropdown">
+        Username
+      </button>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="#" id="logoutBtn">Logout</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card p-4 shadow">
+    <h3 id="welcomeMsg">Welcome, User!</h3>
+    <p class="text-muted mt-2">All the Kevin's info will be accessed from here.</p>
+    <button class="btn btn-success mt-3" id="getAccessBtn">Get Access</button>
+
+    <div class="qr-section" id="qrSection">
+      <p class="mt-4 fw-semibold">Scan and pay 100 rupees to get access:</p>
+      <img src="assets/qr.jpeg" alt="Payment QR" class="qr-img rounded shadow">
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
