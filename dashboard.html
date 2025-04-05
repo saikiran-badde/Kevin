@@ -13,6 +13,17 @@
       background-color: #ffffffaa;
       backdrop-filter: blur(10px);
     }
+    .kevin-title {
+      font-size: 3rem;
+      font-weight: bold;
+      font-family: 'Orbitron', sans-serif;
+      color: #333;
+      margin-bottom: 20px;
+      animation: wave-move 3s ease-in-out infinite, rainbow 6s linear infinite;
+      background: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
     .card {
       border-radius: 20px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
@@ -42,6 +53,7 @@
   <!-- Welcome Section -->
   <div class="container mt-5 text-center">
     <div class="card p-4">
+      <div class="kevin-title">KEVIN</div>
       <h2 id="welcomeMessage">Welcome!</h2>
       <p class="lead">All the Kevin's info will be accessed from here</p>
       <button class="btn btn-primary btn-lg mt-3" onclick="showAccess()">Get Access</button>
