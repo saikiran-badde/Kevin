@@ -1,5 +1,3 @@
-
-// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyBEP1-Kxz10v6MuMzVMi-AaLs3gNZNfdaI",
   authDomain: "kevin-267bc.firebaseapp.com",
@@ -9,90 +7,65 @@ const firebaseConfig = {
   appId: "1:302532711334:web:7edf7e82176e4466f0f567",
   measurementId: "G-XSCMPQ3DWK"
 };
-
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+emailjs.init("asApBLVCT-CCvMpnV");
 
-// ---------- LOGIN ----------
-const loginForm = document.getElementById("loginForm");
-if (loginForm) {
-  loginForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const email = document.getElementById("loginEmail").value;
-    const password = document.getElementById("loginPassword").value;
+function login() {
+  const email = document.getElementById("loginEmail").value;
+  const password = document.getElementById("loginPassword").value;
+  firebase.auth().signInWithEmailAndPassword(email, password)
+    .then(user => {
+      localStorage.setItem("username", email.split('@')[0]);
+      window.location.href = "dashboard.html";
+    })
+    .catch(error => alert(error.message));
+}
 
-    auth.signInWithEmailAndPassword(email, password)
-      .then(() => window.location.href = "dashboard.html")
-      .catch((error) => alert("Login failed: " + error.message));
+function logout() {
+  firebase.auth().signOut().then(() => {
+    localStorage.clear();
+    window.location.href = "index.html";
   });
 }
 
-// ---------- SIGNUP ----------
-const signupForm = document.getElementById("signupForm");
-if (signupForm) {
-  signupForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const username = document.getElementById("signupUsername").value;
-    const email = document.getElementById("signupEmail").value;
-    const password = document.getElementById("signupPassword").value;
-    const confirmPassword = document.getElementById("confirmPassword").value;
+function startSignup() {
+  const email = document.getElementById("signupEmail").value;
+  const password = document.getElementById("signupPassword").value;
+  const confirm = document.getElementById("confirmPassword").value;
+  if (password !== confirm) return alert("Passwords do not match.");
 
-    if (password !== confirmPassword) {
-      alert("Passwords do not match!");
-      return;
-    }
+  const otp = Math.floor(100000 + Math.random() * 900000);
+  sessionStorage.setItem("otp", otp);
+  const params = { to_email: email, otp };
 
-    const otp = Math.floor(100000 + Math.random() * 900000);
-    sessionStorage.setItem("otp", otp);
-    sessionStorage.setItem("signupData", JSON.stringify({ username, email, password }));
-
-    emailjs.send("default_service", "template_otp", {
-      to_email: email,
-      otp: otp
-    }).then(() => {
-      const userOTP = prompt("Enter the OTP sent to your email:");
-      if (userOTP == otp) {
-        auth.createUserWithEmailAndPassword(email, password)
-          .then((cred) => {
-            return db.collection("users").doc(cred.user.uid).set({
-              username: username,
-              email: email
-            });
-          })
-          .then(() => {
-            alert("Account created successfully!");
-            window.location.href = "dashboard.html";
-          })
-          .catch((err) => alert("Signup error: " + err.message));
-      } else {
-        alert("Invalid OTP");
-      }
-    }).catch((err) => {
-      alert("Failed to send OTP: " + err.message);
-    });
-  });
+  emailjs.send("service_kfw7h1r", "template_kz0g69a", params)
+    .then(() => {
+      document.getElementById("otpSection").style.display = "block";
+    })
+    .catch(err => alert("OTP Error: " + err));
 }
 
-// ---------- DASHBOARD ----------
-if (window.location.pathname.includes("dashboard.html")) {
-  auth.onAuthStateChanged(async (user) => {
-    if (user) {
-      const doc = await db.collection("users").doc(user.uid).get();
-      const username = doc.data().username;
-      document.getElementById("welcomeMsg").textContent = "Welcome, " + username + "!";
-      document.getElementById("userDropdown").textContent = username;
-    } else {
-      window.location.href = "index.html";
-    }
-  });
+function verifyAndSignup() {
+  const enteredOtp = document.getElementById("otpInput").value;
+  const originalOtp = sessionStorage.getItem("otp");
+  if (enteredOtp !== originalOtp) return alert("Incorrect OTP");
 
-  document.getElementById("logoutBtn").addEventListener("click", () => {
-    auth.signOut().then(() => window.location.href = "index.html");
-  });
+  const email = document.getElementById("signupEmail").value;
+  const password = document.getElementById("signupPassword").value;
+  firebase.auth().createUserWithEmailAndPassword(email, password)
+    .then(user => {
+      alert("Account created successfully!");
+      localStorage.setItem("username", email.split('@')[0]);
+      window.location.href = "dashboard.html";
+    })
+    .catch(error => alert("Signup error: " + error.message));
+}
 
-  document.getElementById("getAccessBtn").addEventListener("click", () => {
-    document.getElementById("qrSection").style.display = "block";
-  });
+// Dashboard logic
+if (window.location.pathname.includes("dashboard")) {
+  const name = localStorage.getItem("username");
+  if (name) {
+    document.getElementById("welcomeMessage").innerText = `Welcome, ${name}!`;
+    document.getElementById("userDropdown").innerText = name;
+  }
 }
