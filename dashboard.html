@@ -2,34 +2,73 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>KEVIN - Dashboard</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+  <style>
+    body {
+      background: linear-gradient(to right, #ffecd2, #fcb69f);
+      min-height: 100vh;
+    }
+    .navbar {
+      background-color: #ffffffaa;
+      backdrop-filter: blur(10px);
+    }
+    .card {
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      background: linear-gradient(to right, #d9afd9, #97d9e1);
+    }
+    #qrSection {
+      display: none;
+    }
+  </style>
 </head>
-<body class="bg-light">
-  <div class="container text-center mt-4">
-    <div class="d-flex justify-content-between align-items-center">
-      <h2>KEVIN</h2>
-      <div class="dropdown">
-        <button class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" id="userDropdown"></button>
-        <ul class="dropdown-menu">
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg px-4">
+    <div class="container-fluid">
+      <span class="navbar-brand fw-bold fs-4">KEVIN</span>
+      <div class="dropdown ms-auto">
+        <button class="btn btn-outline-dark dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+          Username
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
           <li><a class="dropdown-item" href="#" onclick="logout()">Logout</a></li>
         </ul>
       </div>
     </div>
-    <h3 id="welcomeMessage" class="mt-4"></h3>
-    <p>All the Kevin's info will be accessed from here</p>
-    <button class="btn btn-primary" onclick="document.getElementById('qrSection').style.display='block'">Get Access</button>
-    <div id="qrSection" style="display:none;" class="mt-4">
-      <p>Scan and pay 100 rupees to get access</p>
-      <img src="assets/qr.png" alt="QR Code" class="img-fluid" width="250">
+  </nav>
+
+  <!-- Welcome Section -->
+  <div class="container mt-5 text-center">
+    <div class="card p-4">
+      <h2 id="welcomeMessage">Welcome!</h2>
+      <p class="lead">All the Kevin's info will be accessed from here</p>
+      <button class="btn btn-primary btn-lg mt-3" onclick="showAccess()">Get Access</button>
+    </div>
+
+    <div class="card p-4 mt-4" id="qrSection">
+      <img src="qr.jpg" alt="Scan and Pay QR" class="img-fluid rounded" style="max-width: 300px;" />
+      <p class="mt-3 fs-5">Scan and pay 100 rupees to get access</p>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="firebase-config.js"></script>
   <script src="script.js"></script>
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      const name = localStorage.getItem("username");
+      if (!name) return location.href = "index.html";
+      document.getElementById("welcomeMessage").innerText = `Welcome, ${name}!`;
+      document.getElementById("userDropdown").innerText = name;
+    });
+
+    function showAccess() {
+      document.getElementById("qrSection").style.display = "block";
+    }
+  </script>
 </body>
 </html>
