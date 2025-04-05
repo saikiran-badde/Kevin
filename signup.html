@@ -4,16 +4,17 @@
   <meta charset="UTF-8" />
   <title>KEVIN - Signup</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
-  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2.6.4/dist/email.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
   <style>
     body {
-      background: linear-gradient(to right, #ffecd2, #fcb69f);
+      background: linear-gradient(to right, #fceabb, #f8b500);
       height: 100vh;
     }
     .card {
       margin-top: 100px;
       border-radius: 20px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      background: linear-gradient(to right, #e0c3fc, #8ec5fc);
     }
   </style>
 </head>
@@ -35,9 +36,81 @@
     </div>
   </div>
 
-  <script src="firebase-config.js"></script>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  <script>emailjs.init("asApBLVCT-CCvMpnV");</script>
-  <script src="script.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBEP1-Kxz10v6MuMzVMi-AaLs3gNZNfdaI",
+      authDomain: "kevin-267bc.firebaseapp.com",
+      projectId: "kevin-267bc",
+      storageBucket: "kevin-267bc.firebasestorage.app",
+      messagingSenderId: "302532711334",
+      appId: "1:302532711334:web:7edf7e82176e4466f0f567",
+      measurementId: "G-XSCMPQ3DWK"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    emailjs.init("asApBLVCT-CCvMpnV");
+
+    function startSignup() {
+      const email = document.getElementById("signupEmail").value.trim();
+      const username = document.getElementById("signupUsername").value.trim();
+      const password = document.getElementById("signupPassword").value;
+      const confirm = document.getElementById("confirmPassword").value;
+
+      if (!username || !email || !password || !confirm) {
+        return alert("Please fill all fields.");
+      }
+      if (password !== confirm) {
+        return alert("Passwords do not match.");
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return alert("Please enter a valid email address.");
+      }
+
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      sessionStorage.setItem("otp", otp);
+      sessionStorage.setItem("username", username);
+      sessionStorage.setItem("email", email);
+      sessionStorage.setItem("password", password);
+
+      const templateParams = {
+        to_email: email,
+        otp: otp
+      };
+
+      emailjs.send("service_kfw7h1r", "template_kz0g69a", templateParams)
+        .then(() => {
+          alert("OTP has been sent to your email.");
+          document.getElementById("otpSection").style.display = "block";
+        })
+        .catch(err => {
+          console.error("EmailJS send error:", err);
+          alert("Failed to send OTP. Check EmailJS setup and template fields.");
+        });
+    }
+
+    function verifyAndSignup() {
+      const enteredOtp = document.getElementById("otpInput").value;
+      const originalOtp = sessionStorage.getItem("otp");
+      const username = sessionStorage.getItem("username");
+      const email = sessionStorage.getItem("email");
+      const password = sessionStorage.getItem("password");
+
+      if (!enteredOtp) return alert("Please enter the OTP.");
+      if (enteredOtp !== originalOtp) return alert("Incorrect OTP");
+
+      firebase.auth().createUserWithEmailAndPassword(email, password)
+        .then(user => {
+          alert("Account created successfully!");
+          localStorage.setItem("username", username);
+          window.location.href = "dashboard.html";
+        })
+        .catch(error => alert("Signup error: " + error.message));
+    }
+  </script>
 </body>
 </html>
