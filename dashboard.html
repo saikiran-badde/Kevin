@@ -140,10 +140,9 @@
   <script src="firebase-config.js"></script>
   <script src="script.js"></script>
   <script>
-      function showFullPDF(pdfPath) {
-      document.getElementById('pdfFrame').src = pdfPath;
-      document.getElementById('fullscreenViewer').classList.remove('hidden');
-    }
+     function showFullPDF(pdfPath) {
+  window.open(pdfPath, '_blank');
+}
     window.addEventListener("DOMContentLoaded", () => {
       const name = localStorage.getItem("username");
       if (!name) return location.href = "index.html";
