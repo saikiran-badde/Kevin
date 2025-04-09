@@ -128,6 +128,10 @@
       document.getElementById("welcomeMessage").innerText = `Welcome, ${name}!`;
       document.getElementById("userDropdown").innerText = name;
     });
+    function showPDF(id) {
+      document.querySelectorAll('.container .card + div').forEach(el => el.classList.add('hidden'));
+      document.getElementById(id).classList.remove('hidden');
+    }
 
     function showAccess() {
       document.getElementById("qrSection").style.display = "block";
