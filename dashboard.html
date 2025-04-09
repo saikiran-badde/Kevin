@@ -141,7 +141,9 @@
   <script src="script.js"></script>
   <script>
      function showFullPDF(pdfPath) {
-  window.open(pdfPath, '_blank');
+  const fullUrl = `${location.origin}/${pdfPath}`;
+  const viewer = `https://docs.google.com/gview?url=${fullUrl}&embedded=true`;
+  window.open(viewer, '_blank');
 }
     window.addEventListener("DOMContentLoaded", () => {
       const name = localStorage.getItem("username");
