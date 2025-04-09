@@ -108,16 +108,13 @@
     </div>
     <div class="kevin-docs-header">Kevin Docs</div>
     <div class="doc-cards">
-      <button class="doc-card" onclick="showPDF('oracle-pdf')">Oracle ERP EBS</button>
+      <button class="doc-card" onclick="showFullPDF('BSK%20ERP%20WITHOUT%20WATERMARK_compressed.pdf')">Oracle ERP EBS (Compressed)</button>
       <div class="doc-card">Oracle ERP Fusion</div>
     </div>
-
-    <div id="oracle-pdf-compressed" class="container mt-4 hidden">
-      <div class="card p-3">
-        <h5>Oracle ERP EBS Compressed</h5>
-        <iframe src="BSK%20ERP%20WITHOUT%20WATERMARK_compressed.pdf" width="100%" height="600px" style="border:none;"></iframe>
-      </div>
     </div>
+  </div>
+  <div id="fullscreenViewer" class="fullscreen-pdf hidden">
+    <iframe id="pdfFrame" src="" allowfullscreen></iframe>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -126,16 +123,16 @@
   <script src="firebase-config.js"></script>
   <script src="script.js"></script>
   <script>
+      function showFullPDF(pdfPath) {
+      document.getElementById('pdfFrame').src = pdfPath;
+      document.getElementById('fullscreenViewer').classList.remove('hidden');
+    }
     window.addEventListener("DOMContentLoaded", () => {
       const name = localStorage.getItem("username");
       if (!name) return location.href = "index.html";
       document.getElementById("welcomeMessage").innerText = `Welcome, ${name}!`;
       document.getElementById("userDropdown").innerText = name;
     });
-    function showPDF(id) {
-      document.querySelectorAll('.container .card + div').forEach(el => el.classList.add('hidden'));
-      document.getElementById(id).classList.remove('hidden');
-    }
 
     function showAccess() {
       document.getElementById("qrSection").style.display = "block";
