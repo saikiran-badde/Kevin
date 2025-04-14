@@ -158,14 +158,15 @@
   <script src="firebase-config.js"></script>
   <script src="script.js"></script>
   <script>
-emailjs.init("asApBLVCT-CCvMpnV");
- const auth = getAuth(app);
+     const auth = getAuth(app);
     const db = getFirestore(app);
     window.auth = auth;
     window.db = db;
     window.doc = doc;
     window.getDoc = getDoc;
     window.setDoc = setDoc;
+emailjs.init("asApBLVCT-CCvMpnV");
+
     async function requestAccess() {
       const user = auth.currentUser;
       if (!user) return alert("Please log in first.");
