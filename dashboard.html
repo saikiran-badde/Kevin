@@ -4,27 +4,40 @@
   <meta charset="UTF-8" />
   <title>KEVIN - Dashboard</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCZtRoanYqhEHapzyylSdsciYJc_iG1FyI",
+      authDomain: "kevin-docs.firebaseapp.com",
+      projectId: "kevin-docs",
+      storageBucket: "kevin-docs.appspot.com",
+      messagingSenderId: "636511201809",
+      appId: "1:636511201809:web:5f6cd7fa35247149d6dfb0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    window.auth = auth;
+    window.db = db;
+    window.doc = doc;
+    window.getDoc = getDoc;
+    window.setDoc = setDoc;
+    window.onAuthStateChanged = onAuthStateChanged;
+  </script>
   <style>
     body {
       background: linear-gradient(to right, #ffecd2, #fcb69f);
-      min-height: 100vh;
       background: url('background3.jpg.jpeg') no-repeat center center fixed;
       background-size: cover;
-      position: relative;
-
+      margin: 0;
     }
-    @keyframes wave-move {
-      0%, 100% {
-        transform: translateY(0);
-      }
-      50% {
-        transform: translateY(-10px);
-      }
-    }
-
-    @keyframes rainbow {
-      0% { filter: hue-rotate(0deg); }
-      100% { filter: hue-rotate(360deg); }
+    html, body {
+      height: 100%;
     }
     .navbar {
       background-color: #ffffffaa;
@@ -34,8 +47,6 @@
       font-size: 3rem;
       font-weight: bold;
       font-family: 'Orbitron', sans-serif;
-      color: #333;
-      margin-bottom: 20px;
       animation: wave-move 3s ease-in-out infinite, rainbow 6s linear infinite;
       background: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet);
       -webkit-background-clip: text;
@@ -46,56 +57,12 @@
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
       background: linear-gradient(to right, #d9afd9, #97d9e1);
     }
-    #qrSection {
-      display: none;
-    }
-    .kevin-docs-header {
-      color: white;
-      margin: 40px 0 10px;
-      font-size: 2rem;
-      z-index: 1;
-    }
-
-    .doc-cards {
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      margin-bottom: 40px;
-      z-index: 1;
-      position: relative;
-    }
-
-    .doc-card {
-      background: #ffffffcc;
-      backdrop-filter: blur(5px);
-      border-radius: 15px;
-      padding: 20px;
-      width: 250px;
-      text-align: center;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-      font-weight: bold;
-    }
-    .fullscreen-pdf {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1000;
-      background: white;
-    }
-    .fullscreen-pdf iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-    .hidden {
-      display: none;
-    }
+    .doc-cards { display: flex; gap: 20px; justify-content: center; margin-bottom: 40px; }
+    .doc-card { background: #ffffffcc; border-radius: 15px; padding: 20px; width: 250px; font-weight: bold; border: none; }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
-  <!-- Navbar -->
   <nav class="navbar navbar-expand-lg px-4">
     <div class="container-fluid">
       <span class="navbar-brand fw-bold fs-4">KEVIN</span>
@@ -110,49 +77,80 @@
     </div>
   </nav>
 
-  <!-- Welcome Section -->
   <div class="container mt-5 text-center">
     <div class="card p-4">
       <div class="kevin-title">KEVIN</div>
       <h2 id="welcomeMessage">Welcome!</h2>
       <p class="lead">All the Kevin's info will be accessed from here</p>
-      <button class="btn btn-primary btn-lg mt-3" onclick="showAccess()">Get Access</button>
+      <button class="btn btn-primary btn-lg mt-3" onclick="requestAccess()">Get Access</button>
+      <p id="access-status" class="text-danger mt-2"></p>
     </div>
 
-    <div class="card p-4 mt-4" id="qrSection">
-      <img src="qr.jpeg" alt="Scan and Pay QR" class="img-fluid rounded" style="max-width: 300px;" />
-      <p class="mt-3 fs-5">Scan and pay 100 rupees to get access</p>
-    </div>
     <div class="kevin-docs-header">Kevin Docs</div>
     <div class="doc-cards">
-      <button class="doc-card" onclick="showFullPDF('BSK%20ERP%20WITHOUT%20WATERMARK_compressed.pdf')">Oracle ERP EBS</button>
-      <div class="doc-card">Oracle ERP Fusion</div>
+      <button class="doc-card" id="docBtn1" onclick="showFullPDF('BSK%20ERP%20WITHOUT%20WATERMARK.pdf')" disabled>Oracle ERP EBS</button>
+      <button class="doc-card" id="docBtn2" onclick="showFullPDF('BSK%20ERP%20WITHOUT%20WATERMARK_compressed.pdf')" disabled>Oracle ERP EBS (Compressed)</button>
     </div>
-    </div>
-  </div>
-  <div id="fullscreenViewer" class="fullscreen-pdf hidden">
-    <iframe id="pdfFrame" src="" allowfullscreen></iframe>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  <script src="firebase-config.js"></script>
-  <script src="script.js"></script>
   <script>
-     function showFullPDF(pdfPath) {
-  window.open(pdfPath, '_blank');
-}
-    window.addEventListener("DOMContentLoaded", () => {
-      const name = localStorage.getItem("username");
-      if (!name) return location.href = "index.html";
-      document.getElementById("welcomeMessage").innerText = `Welcome, ${name}!`;
-      document.getElementById("userDropdown").innerText = name;
-    });
+    emailjs.init("asApBLVCT-CCvMpnV");
 
-    function showAccess() {
-      document.getElementById("qrSection").style.display = "block";
+    async function requestAccess() {
+  const user = auth.currentUser;
+  if (!user) return alert("Please log in first.");
+
+  const userEmail = user.email;
+  try {
+    const userDoc = await getDoc(doc(db, "users", user.uid));
+    const username = userDoc.exists() ? userDoc.data().username : "Unknown";
+
+    const templateParams = {
+      from_email: userEmail,
+      message: `User ${userEmail} (Username: ${username}) is requesting access to view the document.`
+    };
+
+    await emailjs.send("service_y2gxf7e", "template_kz0g69a", templateParams);
+    await setDoc(doc(db, "access", user.uid), { hasAccess: false });
+    document.getElementById("access-status").innerText = "✅ Request sent! Please wait for admin approval.";
+  } catch (err) {
+    document.getElementById("access-status").innerText = "❌ Failed to send request.";
+    console.error(err);
+  }
+}
     }
+
+    function showFullPDF(pdfPath) {
+      const fullUrl = `${location.origin}/${pdfPath}`;
+      const viewer = `https://docs.google.com/gview?url=${fullUrl}&embedded=true`;
+      window.open(viewer, '_blank');
+    }
+
+    function logout() {
+      auth.signOut().then(() => {
+        localStorage.removeItem("username");
+        window.location.href = "index.html";
+      });
+    }
+
+    onAuthStateChanged(auth, async user => {
+      if (!user) return (window.location.href = "index.html");
+      document.getElementById("userDropdown").innerText = user.email;
+      document.getElementById("welcomeMessage").innerText = `Welcome, ${user.email}`;
+      try {
+        const accessDoc = await getDoc(doc(db, "access", user.uid));
+        if (accessDoc.exists() && accessDoc.data().hasAccess === true) {
+          document.getElementById("docBtn1").disabled = false;
+          document.getElementById("docBtn2").disabled = false;
+          document.getElementById("access-status").innerText = "✅ Access granted.";
+        } else {
+          document.getElementById("access-status").innerText = "🔒 Access not yet granted.";
+        }
+      } catch (e) {
+        console.error("Access check error:", e);
+      }
+    });
   </script>
 </body>
 </html>
