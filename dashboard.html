@@ -10,15 +10,7 @@
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCZtRoanYqhEHapzyylSdsciYJc_iG1FyI",
-      authDomain: "kevin-docs.firebaseapp.com",
-      projectId: "kevin-docs",
-      storageBucket: "kevin-docs.appspot.com",
-      messagingSenderId: "636511201809",
-      appId: "1:636511201809:web:5f6cd7fa35247149d6dfb0"
-    };
-const app = initializeApp(firebaseConfig);
+   
     const auth = getAuth(app);
     const db = getFirestore(app);
     window.auth = auth;
