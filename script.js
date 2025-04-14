@@ -54,3 +54,6 @@ function logout() {
     window.location.href = "index.html";
   });
 }
+ function showAccess() {
+      document.getElementById("qrSection").style.display = "block";
+    }
