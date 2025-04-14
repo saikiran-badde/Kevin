@@ -4,6 +4,29 @@
   <meta charset="UTF-8" />
   <title>KEVIN - Dashboard</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCZtRoanYqhEHapzyylSdsciYJc_iG1FyI",
+      authDomain: "kevin-docs.firebaseapp.com",
+      projectId: "kevin-docs",
+      storageBucket: "kevin-docs.appspot.com",
+      messagingSenderId: "636511201809",
+      appId: "1:636511201809:web:5f6cd7fa35247149d6dfb0"
+    };
+const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    window.auth = auth;
+    window.db = db;
+    window.doc = doc;
+    window.getDoc = getDoc;
+    window.setDoc = setDoc;
+  </script>
   <style>
     body {
       background: linear-gradient(to right, #ffecd2, #fcb69f);
@@ -116,7 +139,9 @@
       <div class="kevin-title">KEVIN</div>
       <h2 id="welcomeMessage">Welcome!</h2>
       <p class="lead">All the Kevin's info will be accessed from here</p>
-      <button class="btn btn-primary btn-lg mt-3" onclick="showAccess()">Get Access</button>
+      <button class="btn btn-primary btn-lg mt-3" id="accessBtn" onclick="requestAccess()">Get Access</button>
+      <p id="access-status" class="text-danger mt-2"></p>
+
     </div>
 
     <div class="card p-4 mt-4" id="qrSection">
@@ -140,14 +165,88 @@
   <script src="firebase-config.js"></script>
   <script src="script.js"></script>
   <script>
-     function showFullPDF(pdfPath) {
-  window.open(pdfPath, '_blank');
-}
+emailjs.init("asApBLVCT-CCvMpnV");
+
+    async function requestAccess() {
+      const user = auth.currentUser;
+      if (!user) return alert("Please log in first.");
+
+      const accessBtn = document.getElementById("accessBtn");
+      accessBtn.disabled = true;
+      accessBtn.innerText = "Requesting...";
+
+      const userEmail = user.email;
+
+      try {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        const username = userDoc.exists() ? userDoc.data().username : "Unknown";
+
+        const accessDoc = await getDoc(doc(db, "access", user.uid));
+        if (accessDoc.exists()) {
+          const { hasAccess } = accessDoc.data();
+          if (hasAccess) {
+            document.getElementById("access-status").innerText = "✅ You already have access.";
+            accessBtn.disabled = false;
+            accessBtn.innerText = "Get Access";
+            return;
+          } else {
+            document.getElementById("access-status").innerText = "📨 Request already sent. Please wait for approval.";
+            accessBtn.disabled = false;
+            accessBtn.innerText = "Get Access";
+            return;
+          }
+        }
+
+        const templateParams = {
+          from_email: userEmail,
+          message: `User ${userEmail} (Username: ${username}) is requesting access to view the document.`
+        };
+
+        await emailjs.send("service_y2gxf7e", "template_kz0g69a", templateParams);
+        await setDoc(doc(db, "access", user.uid), { hasAccess: false });
+
+        document.getElementById("access-status").innerText = "✅ Request sent! Please wait for admin approval.";
+      } catch (err) {
+        console.error(err);
+        document.getElementById("access-status").innerText = "❌ Failed to send request.";
+      } finally {
+        accessBtn.disabled = false;
+        accessBtn.innerText = "Get Access";
+      }
+    }
+      function showFullPDF(pdfPath) {
+      const fullUrl = `${location.origin}/${pdfPath}`;
+      const viewer = `https://docs.google.com/gview?url=${fullUrl}&embedded=true`;
+      window.open(viewer, '_blank');
+    }
+
     window.addEventListener("DOMContentLoaded", () => {
       const name = localStorage.getItem("username");
       if (!name) return location.href = "index.html";
       document.getElementById("welcomeMessage").innerText = `Welcome, ${name}!`;
       document.getElementById("userDropdown").innerText = name;
+    });
+import("https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js").then(({ onAuthStateChanged }) => {
+      onAuthStateChanged(auth, async user => {
+        if (!user) return (window.location.href = "index.html");
+        try {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          const username = userDoc.exists() ? userDoc.data().username : user.email;
+          document.getElementById("userDropdown").innerText = username;
+          document.getElementById("welcomeMessage").innerText = `Welcome, ${username}`;
+
+          const accessDoc = await getDoc(doc(db, "access", user.uid));
+          if (accessDoc.exists() && accessDoc.data().hasAccess === true) {
+            document.getElementById("docBtn1").disabled = false;
+            document.getElementById("docBtn2").disabled = false;
+            document.getElementById("access-status").innerText = "✅ Access granted.";
+          } else {
+            document.getElementById("access-status").innerText = "🔒 Access not yet granted.";
+          }
+        } catch (e) {
+          console.error("Access check error:", e);
+        }
+      });
     });
 
     function showAccess() {
